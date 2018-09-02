@@ -22,8 +22,9 @@ function NoteBox(key, onClick) {
   this.key = key;
   this.onClick = onClick || function() {};
 
-  // Plays the audio associated with this NoteBox
-  this.play = function() {
+  /* Plays the audio associated with this NoteBox
+  calls passed in function done when its done playing if it exists */
+  this.play = function(done) {
     playing++;
     // Always play from the beginning of the file.
     audioEl.currentTime = 0;
@@ -35,6 +36,9 @@ function NoteBox(key, onClick) {
       playing--;
       if (!playing) {
         boxEl.classList.remove("active");
+      }
+      if (done) {
+        done();
       }
     }, NOTE_DURATION);
   };
@@ -65,15 +69,17 @@ function NoteBox(key, onClick) {
 // This will create a map from key strings (i.e. 'c') to NoteBox objects so that
 // clicking the corresponding boxes on the page will play the NoteBox's audio.
 // It will also demonstrate programmatically playing notes by calling play directly.
-var notes = {};
+function example() {
+  var notes = {};
 
-KEYS.forEach(function(key) {
-  notes[key] = new NoteBox(key);
-});
+  KEYS.forEach(function(key) {
+    notes[key] = new NoteBox(key);
+  });
 
-KEYS.concat(KEYS.slice().reverse()).forEach(function(key, i) {
-  setTimeout(notes[key].play.bind(null, key), i * NOTE_DURATION);
-});
+  KEYS.concat(KEYS.slice().reverse()).forEach(function(key, i) {
+    setTimeout(notes[key].play.bind(null, key), i * NOTE_DURATION);
+  });
+}
 
 function simon() {
   var notes = {};
@@ -103,7 +109,7 @@ function simon() {
   }
 
   function playNote(key, done) {
-    notes[key].play.bind(null, key, done)(); //is bind needed?
+    notes[key].play.bind(null, done)(); //is bind needed?
   }
 
   function playSequence(sequence, done) {
@@ -137,14 +143,15 @@ function simon() {
       }
       updateScore();
     } else {
-      gameOver();
+      restartGame();
     }
   }
 
-  function gameOver() {
-    console.log("game over!");
+  function restartGame() {
     score = 0;
     updateScore();
+    sequence = [];
+    setTimeout(playNextSequence, 1500);
   }
 
   function updateScore() {
