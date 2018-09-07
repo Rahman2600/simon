@@ -12,8 +12,7 @@ playing a note.
 * First wrote helper functions I'd need e.g. for enabling the noteboxes or playing a note
 * Focused on making the game run once at first then I made a game loop.
 * Manually tested the code by playing the game trying to make sure every path through the code works which helped me catch a few bugs 
-like game not restarting if you lost
-di
+like game not restarting if you lost.
 
 ## What resources I used
 
