@@ -104,7 +104,7 @@ function simon() {
   }
 
   function playNote(key, done) {
-    notes[key].play.bind(null, done)(); //is bind needed?
+    notes[key].play.bind(null, done)();
   }
 
   function playSequence(sequence, done) {
