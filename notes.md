@@ -18,6 +18,6 @@ when to ignore click events.
 * Manually tested the code by playing the game trying to make sure every path through the code works which helped me catch a few bugs 
 like game not restarting if you lost.
 
-## What resources I used
+## Resources I used
 
 Googled a few things to refersh my memory e.g. DOM manipulation to update the score
