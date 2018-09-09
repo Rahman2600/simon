@@ -1,5 +1,6 @@
 var KEYS = ["c", "d", "e", "f"];
 var NOTE_DURATION = 1000;
+var TIME_BETWEEN_ROUNDS = 1500;
 
 // NoteBox
 //
@@ -22,8 +23,8 @@ function NoteBox(key, onClick) {
   this.key = key;
   this.onClick = onClick || function() {};
 
-  /* Plays the audio associated with this NoteBox
-  calls passed in function done when its done playing if it exists */
+  // Plays the audio associated with this NoteBox
+  // calls passed in function done when its done playing if it exists
   this.play = function(done) {
     playing++;
     // Always play from the beginning of the file.
@@ -61,7 +62,9 @@ function NoteBox(key, onClick) {
     this.play();
   }.bind(this);
 
-  boxEl.addEventListener("mousedown", this.clickHandler);
+  boxEl.addEventListener("mousedown", () => {
+    this.onClick(this.key);
+  });
 }
 
 // Example usage of NoteBox.
@@ -83,9 +86,13 @@ function example() {
 
 function simon() {
   var notes = {};
-  var sequence = []; //the stack of notes that was played and should be played by user
-  var nextIndex = 0; //index of correct next note
-  var score = 0;
+  KEYS.forEach(function(key) {
+    notes[key] = new NoteBox(key, onClick);
+  });
+  var sequence; //the stack of notes that was played and should be played by user
+  var nextIndex; //index of correct next note
+  var score;
+  var isAwaitingReplay; //true when game is waiting for user to play notes
 
   function getRandomKey() {
     return KEYS[getRandomInt(KEYS.length)];
@@ -94,18 +101,6 @@ function simon() {
   //from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
   function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
-  }
-
-  function enableAll() {
-    for (var key of Object.keys(notes)) {
-      notes[key].enable();
-    }
-  }
-
-  function disableAll() {
-    for (var key of Object.keys(notes)) {
-      notes[key].disable();
-    }
   }
 
   function playNote(key, done) {
@@ -129,46 +124,59 @@ function simon() {
 
   //called when sequence is done playing
   function done() {
-    enableAll();
+    isAwaitingReplay = true;
   }
 
   function onClick(key) {
-    if (key === sequence[nextIndex]) {
-      if (nextIndex < sequence.length - 1) {
-        nextIndex += 1;
+    if (isAwaitingReplay) {
+      if (key === sequence[nextIndex]) {
+        playNote(key);
+        if (nextIndex < sequence.length - 1) {
+          nextIndex += 1;
+        } else {
+          isAwaitingReplay = false;
+          score += 1;
+          updateScore();
+          nextIndex = 0;
+          setTimeout(nextRound, TIME_BETWEEN_ROUNDS);
+        }
       } else {
-        score += 1;
-        nextIndex = 0;
-        setTimeout(playNextSequence, 1500);
+        isAwaitingReplay = false;
+        gameOver();
       }
-      updateScore();
-    } else {
-      restartGame();
     }
   }
 
-  function restartGame() {
+  function gameOver() {
     score = 0;
     updateScore();
-    sequence = [];
-    setTimeout(playNextSequence, 1500);
+    document.getElementById("gameOver").style.display = "inline";
+    setTimeout(clearGameOver, TIME_BETWEEN_ROUNDS / 4);
+    setTimeout(startGame, TIME_BETWEEN_ROUNDS);
+    function clearGameOver() {
+      document.getElementById("gameOver").style.display = "none";
+    }
   }
 
   function updateScore() {
     document.getElementById("score").innerHTML = score;
   }
 
-  KEYS.forEach(function(key) {
-    notes[key] = new NoteBox(key, onClick);
-  });
-
-  function playNextSequence() {
-    disableAll();
+  function nextRound() {
     sequence.push(getRandomKey());
     playSequence(sequence, done);
   }
 
-  playNextSequence();
+  function startGame() {
+    sequence = [];
+    nextIndex = 0;
+    score = 0;
+    isAwaitingReplay = false;
+    updateScore();
+    nextRound();
+  }
+
+  startGame();
 }
 
 simon();
