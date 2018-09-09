@@ -5,7 +5,7 @@
 
 ## Code explanation
 
-* I added to the effects of play in the notebox api by modifying it to call passed in callback function if passed in when it is done
+* I added to the effects of play in the notebox api by modifying it to call passed in callback function (if passed in) when it is done
 playing a note.
 * I also changed the function called on the mousedown event to the onClick function of the notebox so I could play a note only if it was 
 the correct note in the sequence
