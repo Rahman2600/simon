@@ -13,7 +13,7 @@ I use isAwaitingReplay to keep track of whether the game is awaiting input from 
 when to ignore click events.
 ## How I approached and solved the problem
 
-* First wrote helper functions I thought I wouldd need e.g. for playing a note
+* First wrote helper functions I thought I would need e.g. for playing a note
 * Focused on making the game run once at first then I made a game loop.
 * Manually tested the code by playing the game trying to make sure every path through the code works which helped me catch a few bugs 
 like game not restarting if you lost.
